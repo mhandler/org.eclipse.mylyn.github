@@ -16,8 +16,13 @@
  */
 package org.eclipse.mylyn.github.ui.internal;
 
+import java.util.Iterator;
+import java.util.Set;
+
+import org.eclipse.mylyn.github.internal.GitHub;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
+import org.eclipse.mylyn.tasks.ui.editors.TaskEditorPartDescriptor;
 
 /**
  * Editor page for GitHub.
@@ -27,15 +32,29 @@ import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
  */
 public class GitHubTaskEditorPage extends AbstractTaskEditorPage {
 
-	/**
-	 * Constructor for the GitHubTaskEditorPage
-	 * 
-	 * @param editor
-	 *            The task editor to create for GitHub
-	 */
-	public GitHubTaskEditorPage(final TaskEditor editor) {
-		super(editor, GitHubRepositoryConnector.KIND);
-		setNeedsPrivateSection(false);
-	}
+    /**
+     * Constructor for the GitHubTaskEditorPage
+     * 
+     * @param editor
+     *            The task editor to create for GitHub
+     */
+    public GitHubTaskEditorPage(final TaskEditor editor) {
+        super(editor, GitHub.CONNECTOR_KIND);
+        setNeedsPrivateSection(true);
+        setNeedsSubmitButton(true);
+    }
+
+    @Override
+    protected Set<TaskEditorPartDescriptor> createPartDescriptors() {
+        Set<TaskEditorPartDescriptor> partDescriptors = super.createPartDescriptors();
+        Iterator<TaskEditorPartDescriptor> iterator = partDescriptors.iterator();
+        while (iterator.hasNext()) {
+            TaskEditorPartDescriptor descriptor = iterator.next();
+            if (descriptor.getId() == ID_PART_ATTRIBUTES) {
+                iterator.remove();
+            }
+        }
+        return partDescriptors;
+    }
 
 }

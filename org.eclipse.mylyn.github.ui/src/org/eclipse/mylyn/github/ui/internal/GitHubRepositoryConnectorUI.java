@@ -17,6 +17,7 @@
 package org.eclipse.mylyn.github.ui.internal;
 
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.mylyn.github.internal.GitHub;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -34,64 +35,63 @@ import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
  */
 public class GitHubRepositoryConnectorUI extends AbstractRepositoryConnectorUi {
 
-	/**
-	 * 
-	 * 
-	 * @return the unique type of the repository: "github"
-	 */
-	@Override
-	public String getConnectorKind() {
-		return GitHubRepositoryConnector.KIND;
-	}
+    /**
+     * 
+     * 
+     * @return the unique type of the repository: "github"
+     */
+    @Override
+    public String getConnectorKind() {
+        return GitHub.CONNECTOR_KIND;
+    }
 
-	/**
-	 * 
-	 * 
-	 * @return {@link AbstractRepositorySettingsPage} with GitHub specific
-	 *         parameter like user name, password, ...
-	 */
-	@Override
-	public ITaskRepositoryPage getSettingsPage(
-			final TaskRepository taskRepository) {
-		return new GitHubRepositorySettingsPage(taskRepository);
-	}
+    /**
+     * 
+     * 
+     * @return {@link AbstractRepositorySettingsPage} with GitHub specific
+     *         parameter like user name, password, ...
+     */
+    @Override
+    public ITaskRepositoryPage getSettingsPage(final TaskRepository taskRepository) {
+        return new GitHubRepositorySettingsPage(taskRepository);
+    }
 
-	/**
-	 * 
-	 * 
-	 * @return {@link NewTaskWizard} with GitHub specific tab
-	 */
-	@Override
-	public IWizard getNewTaskWizard(final TaskRepository taskRepository,
-			final ITaskMapping taskSelection) {
-		return new NewTaskWizard(taskRepository, taskSelection);
-	}
+    /**
+     * 
+     * 
+     * @return {@link NewTaskWizard} with GitHub specific tab
+     */
+    @Override
+    public IWizard getNewTaskWizard(final TaskRepository taskRepository,
+            final ITaskMapping taskSelection) {
+        return new NewTaskWizard(taskRepository, taskSelection);
+    }
 
-	/**
-	 * This {@link AbstractRepositoryConnectorUi} has search page.
-	 * 
-	 * @return {@code true}
-	 */
-	@Override
-	public boolean hasSearchPage() {
-		return true;
-	}
+    /**
+     * This {@link AbstractRepositoryConnectorUi} has search page.
+     * 
+     * @return {@code true}
+     */
+    @Override
+    public boolean hasSearchPage() {
+        return true;
+    }
 
-	/**
-	 * Returns {@link IWizard} used in Mylyn for creating new queries. This
-	 * {@link IWizard} has a wizard page for creating GitHub specific task
-	 * queries.
-	 * 
-	 * @return {@link RepositoryQueryWizard} with GitHub specific query page
-	 */
-	@Override
-	public IWizard getQueryWizard(final TaskRepository taskRepository,
-			final IRepositoryQuery queryToEdit) {
-		RepositoryQueryWizard wizard = new RepositoryQueryWizard(taskRepository);
-		GitHubRepositoryQueryPage queryPage = new GitHubRepositoryQueryPage(
-				taskRepository, queryToEdit);
-		wizard.addPage(queryPage);
-		return wizard;
-	}
+    /**
+     * Returns {@link IWizard} used in Mylyn for creating new queries. This
+     * {@link IWizard} has a wizard page for creating GitHub specific task
+     * queries.
+     * 
+     * @return {@link RepositoryQueryWizard} with GitHub specific query page
+     */
+    @Override
+    public IWizard getQueryWizard(final TaskRepository taskRepository,
+            final IRepositoryQuery queryToEdit) {
+        RepositoryQueryWizard wizard = new RepositoryQueryWizard(taskRepository);
+        GitHubRepositoryQueryPage queryPage = new GitHubRepositoryQueryPage(taskRepository,
+                queryToEdit);
+        wizard.addPage(queryPage);
+        return wizard;
+    }
 
 }

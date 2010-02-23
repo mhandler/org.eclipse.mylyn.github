@@ -20,8 +20,6 @@ import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -37,105 +35,94 @@ import org.eclipse.swt.widgets.Text;
  */
 public class GitHubRepositoryQueryPage extends AbstractRepositoryQueryPage {
 
-	private Text owner = null, project = null, queryText = null;
+    private static final String ATTR_QUERY_TEXT = "queryText";
 
-	private Combo status = null;
+    private static final String ATTR_STATUS = "status";
 
-	/**
-	 * @param taskRepository
-	 * @param query
-	 */
-	public GitHubRepositoryQueryPage(final TaskRepository taskRepository,
-			final IRepositoryQuery query) {
-		super("GitHub", taskRepository, query);
-		setTitle("GitHub search query parameters");
-		setDescription("Valid search query parameters entered.");
-		setPageComplete(false);
-	}
+    private Text queryText = null;
 
-	@Override
-	public String getQueryTitle() {
-		return "GitHub Query";
-	}
+    private Combo status = null;
 
-	@Override
-	public void applyTo(IRepositoryQuery query) {
-		String ownerString = owner.getText();
-		String projectString = project.getText();
-		String statusString = status.getText();
-		String queryString = queryText.getText();
-		query.setSummary(ownerString + "/" + projectString + ":" + statusString
-				+ ":" + queryString);
-		query.setAttribute("owner", ownerString);
-		query.setAttribute("project", projectString);
-		query.setAttribute("status", statusString);
-		query.setAttribute("queryText", queryString);
-	}
+    /**
+     * @param taskRepository
+     * @param query
+     */
+    public GitHubRepositoryQueryPage(final TaskRepository taskRepository,
+            final IRepositoryQuery query) {
+        super("GitHub", taskRepository, query);
+        setTitle("GitHub search query parameters");
+        setDescription("Valid search query parameters entered.");
+        setPageComplete(false);
+    }
 
-	/**
+    @Override
+    public String getQueryTitle() {
+        return "GitHub Query";
+    }
+
+    @Override
+    public void applyTo(IRepositoryQuery query) {
+        String statusString = status.getText();
+        String queryString = queryText.getText();
+
+        String summary = statusString;
+        summary += " issues";
+        if (queryString != null && queryString.trim().length() > 0) {
+            summary += " matching " + queryString;
+        }
+        query.setSummary(summary);
+        query.setAttribute(ATTR_STATUS, statusString);
+        query.setAttribute(ATTR_QUERY_TEXT, queryString);
+    }
+
+    /**
 	 * 
 	 * 
 	 */
-	public void createControl(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout gridLayout = new GridLayout(2, false);
-		gridLayout.marginTop = 20;
-		gridLayout.marginLeft = 25;
-		gridLayout.verticalSpacing = 8;
-		gridLayout.horizontalSpacing = 8;
-		composite.setLayout(gridLayout);
+    public void createControl(Composite parent) {
+        Composite composite = new Composite(parent, SWT.NONE);
+        GridLayout gridLayout = new GridLayout(2, false);
+        gridLayout.marginTop = 20;
+        gridLayout.marginLeft = 25;
+        gridLayout.verticalSpacing = 8;
+        gridLayout.horizontalSpacing = 8;
+        composite.setLayout(gridLayout);
 
-		ModifyListener modifyListener = new ModifyListener() {
-			public void modifyText(ModifyEvent modifyEvent) {
-				setPageComplete(isPageComplete());
-			}
-		};
+        // create the status option combo box
+        new Label(composite, SWT.NONE).setText("Status:");
+        status = new Combo(composite, SWT.READ_ONLY);
+        String[] queryValues = new String[] { "all", "open", "closed" };
+        status.setItems(queryValues);
+        status.select(0);
+        IRepositoryQuery query = getQuery();
+        if (query != null) {
+            String queryModelStatus = query.getAttribute(ATTR_STATUS);
+            if (queryModelStatus != null) {
+                for (int x = 0; x < queryValues.length; ++x) {
+                    if (queryValues[x].equals(queryModelStatus)) {
+                        status.select(x);
+                        break;
+                    }
+                }
+            }
+        }
 
-		// create the owner entry box
-		new Label(composite, SWT.NONE).setText("Owner:");
-		owner = new Text(composite, SWT.BORDER);
-		GridData gridData = new GridData();
-		gridData.widthHint = 250;
-		owner.setLayoutData(gridData);
-		owner.addModifyListener(modifyListener);
+        // create the query entry box
+        new Label(composite, SWT.NONE).setText("Query text:");
+        queryText = new Text(composite, SWT.BORDER);
+        GridData gridData = new GridData();
+        gridData.widthHint = 250;
+        queryText.setLayoutData(gridData);
+        String queryModelText = query == null ? null : query.getAttribute(ATTR_QUERY_TEXT);
+        queryText.setText(queryModelText == null ? "" : queryModelText);
 
-		// create the project entry box
-		new Label(composite, SWT.NONE).setText("Project:");
-		project = new Text(composite, SWT.BORDER);
-		gridData = new GridData();
-		gridData.widthHint = 250;
-		project.setLayoutData(gridData);
-		project.addModifyListener(modifyListener);
+        setControl(composite);
+    }
 
-		// create the status option combo box
-		new Label(composite, SWT.NONE).setText("Status:");
-		status = new Combo(composite, SWT.READ_ONLY);
-		status.setItems(new String[] { "open", "closed" });
-		status.setText("open");
-
-		// create the query entry box
-		new Label(composite, SWT.NONE).setText("Query text:");
-		queryText = new Text(composite, SWT.BORDER);
-		gridData = new GridData();
-		gridData.widthHint = 250;
-		queryText.setLayoutData(gridData);
-
-		setControl(composite);
-	}
-
-	@Override
-	public boolean isPageComplete() {
-		String ownerString = owner.getText();
-		String projectString = project.getText();
-		if (ownerString == null || ownerString.equals("")) { //$NON-NLS-1$
-			setErrorMessage("Owner must not be empty.");
-			return false;
-		} else if (projectString == null || projectString.equals("")) { //$NON-NLS-1$
-			setErrorMessage("Project name must not be empty.");
-			return false;
-		}
-		setErrorMessage(null);
-		return true;
-	}
+    @Override
+    public boolean isPageComplete() {
+        setErrorMessage(null);
+        return true;
+    }
 
 }

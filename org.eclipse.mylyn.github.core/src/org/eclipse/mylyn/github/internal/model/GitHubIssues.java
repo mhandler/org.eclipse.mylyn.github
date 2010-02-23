@@ -14,22 +14,22 @@
  * limitations under the License.
  *  
  */
-package org.eclipse.mylyn.github;
+package org.eclipse.mylyn.github.internal.model;
 
 /**
  * Container of multiple GitHub Issues, used when returning JSON objects
  */
 public class GitHubIssues {
 
-	private GitHubIssue[] issues;
+    private GitHubIssue[] issues;
 
-	/**
-	 * Getter for all issues inside this object
-	 * 
-	 * @return The array of individual GitHub Issues
-	 */
-	public GitHubIssue[] getIssues() {
-		return issues;
-	}
+    /**
+     * Getter for all issues inside this object
+     * 
+     * @return The array of individual GitHub Issues
+     */
+    public GitHubIssue[] getIssues() {
+        return issues;
+    }
 
 }

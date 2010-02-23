@@ -17,6 +17,8 @@
 package org.eclipse.mylyn.github.ui.internal;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.mylyn.github.internal.GitHub;
+import org.eclipse.mylyn.tasks.ui.ITasksUiConstants;
 import org.eclipse.mylyn.tasks.ui.TasksUiUtil;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPageFactory;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
@@ -34,44 +36,50 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  */
 public class GitHubTaskEditorPageFactory extends AbstractTaskEditorPageFactory {
 
-	private Image gitLogoImage = null;
+    private Image gitLogoImage = null;
 
-	@Override
-	public boolean canCreatePageFor(TaskEditorInput input) {
-		if (GitHubRepositoryConnector.KIND.equals(
-				input.getTask().getConnectorKind())) {
-			return true;
-		}
-		if (TasksUiUtil.isOutgoingNewTask(input.getTask(),
-				GitHubRepositoryConnector.KIND)) {
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public boolean canCreatePageFor(TaskEditorInput input) {
+        if (GitHub.CONNECTOR_KIND.equals(input.getTask().getConnectorKind())) {
+            return true;
+        }
+        if (TasksUiUtil.isOutgoingNewTask(input.getTask(), GitHub.CONNECTOR_KIND)) {
+            return true;
+        }
+        return false;
+    }
 
-	@Override
-	public Image getPageImage() {
-		if (gitLogoImage != null)
-			return gitLogoImage;
-		ImageDescriptor imageDescriptor = AbstractUIPlugin
-				.imageDescriptorFromPlugin("org.eclipse.mylyn.github.ui",
-						"images/git-logo.png");
-		if (imageDescriptor == null) {
-			return null;
-		}
+    @Override
+    public Image getPageImage() {
+        if (gitLogoImage != null)
+            return gitLogoImage;
+        ImageDescriptor imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
+                "org.eclipse.mylyn.github.ui", "images/git-logo.png");
+        if (imageDescriptor == null) {
+            return null;
+        }
 
-		return gitLogoImage = new Image(Display.getCurrent(), imageDescriptor
-				.getImageData());
-	}
+        return gitLogoImage = new Image(Display.getCurrent(), imageDescriptor.getImageData());
+    }
 
-	@Override
-	public String getPageText() {
-		return "GitHub";
-	}
+    @Override
+    public String getPageText() {
+        return "GitHub";
+    }
 
-	@Override
-	public IFormPage createPage(TaskEditor parentEditor) {
-		return new GitHubTaskEditorPage(parentEditor);
-	}
+    @Override
+    public int getPriority() {
+        return PRIORITY_TASK;
+    }
+
+    @Override
+    public IFormPage createPage(TaskEditor parentEditor) {
+        return new GitHubTaskEditorPage(parentEditor);
+    }
+
+    @Override
+    public String[] getConflictingIds(TaskEditorInput input) {
+        return new String[] { ITasksUiConstants.ID_PAGE_PLANNING };
+    }
 
 }
