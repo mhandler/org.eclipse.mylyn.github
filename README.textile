@@ -1,3 +1,7 @@
+h2. Notice
+
+h3. This is my fork of the github mylyn connector. The major difference is that this fork supports comments and works behind a proxy.
+
 h2. Installation update site
 
 h3. http://smilebase.github.com/org.eclipse.mylyn.github/update
