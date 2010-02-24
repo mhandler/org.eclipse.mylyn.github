@@ -20,7 +20,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.mylyn.github.internal.GitHub;
+import org.eclipse.mylyn.github.ui.internal.editorpart.GitHubIntegerEditor;
+import org.eclipse.mylyn.github.ui.internal.editorpart.GitHubTaskEditorPartDescriptor;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPage;
+import org.eclipse.mylyn.tasks.ui.editors.AttributeEditorFactory;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditorPartDescriptor;
 
@@ -54,7 +59,21 @@ public class GitHubTaskEditorPage extends AbstractTaskEditorPage {
                 iterator.remove();
             }
         }
+        partDescriptors.add(new GitHubTaskEditorPartDescriptor());
         return partDescriptors;
+    }
+
+    @Override
+    protected AttributeEditorFactory createAttributeEditorFactory() {
+        return new AttributeEditorFactory(getModel(), getTaskRepository(), getEditorSite()) {
+            @Override
+            public AbstractAttributeEditor createEditor(String type, TaskAttribute taskAttribute) {
+                if (type.equals("integer")) {
+                    return new GitHubIntegerEditor(getModel(), taskAttribute);
+                }
+                return super.createEditor(type, taskAttribute);
+            }
+        };
     }
 
 }

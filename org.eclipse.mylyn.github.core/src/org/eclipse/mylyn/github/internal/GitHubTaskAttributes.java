@@ -8,7 +8,7 @@ public enum GitHubTaskAttributes {
 
     TITLE("Summary", TaskAttribute.SUMMARY, TaskAttribute.TYPE_SHORT_TEXT, true, false, true),
 
-    VOTES("Votes", TaskAttribute.RANK, TaskAttribute.TYPE_INTEGER, false, true, false),
+    VOTES("Votes", "task.github.votes", TaskAttribute.TYPE_INTEGER, false, true, false),
 
     BODY("Description", TaskAttribute.DESCRIPTION, TaskAttribute.TYPE_LONG_RICH_TEXT, true, false,
             true),
