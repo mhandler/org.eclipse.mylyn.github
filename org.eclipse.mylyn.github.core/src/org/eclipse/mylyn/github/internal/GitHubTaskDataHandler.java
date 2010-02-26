@@ -63,12 +63,8 @@ public class GitHubTaskDataHandler extends AbstractTaskDataHandler {
 
         createOperations(data, issue);
         createAttributes(issue, data);
-        updateTaskDataWithComments(repository, data, issue);
 
-        if (isPartial(data)) {
-            data.setPartial(true);
-        }
-
+        data.setPartial(true);
         return data;
     }
 
@@ -163,16 +159,17 @@ public class GitHubTaskDataHandler extends AbstractTaskDataHandler {
     public TaskData createTaskData(TaskRepository repository, IProgressMonitor monitor,
             String user, String project, GitHubIssue issue) {
         TaskData taskData = createPartialTaskData(repository, monitor, user, project, issue);
+        updateTaskDataWithComments(repository, taskData, issue);
         taskData.setPartial(false);
         return taskData;
     }
 
     public void updateTaskDataWithComments(TaskRepository taskRepository, TaskData taskData,
-            GitHubIssue nativeTask) {
+            GitHubIssue issue) {
         String user = connector.computeTaskRepositoryUser(taskRepository);
         String repo = connector.computeTaskRepositoryProject(taskRepository);
-        GitHubComment[] commentArray = loadComments(nativeTask, user, repo);
-        nativeTask.setComments(commentArray);
+        GitHubComment[] commentArray = loadComments(issue, user, repo);
+        issue.setComments(commentArray);
 
         // Initialize a counter, since you want to number each task, since the
         // editor part likes to display
@@ -180,13 +177,13 @@ public class GitHubTaskDataHandler extends AbstractTaskDataHandler {
         int count = 0;
 
         // Loop through the comments in your native database.
-        for (GitHubComment nativeComment : nativeTask.getComments()) {
+        for (GitHubComment comment : issue.getComments()) {
             TaskCommentMapper mapper = new TaskCommentMapper();
             // Set properties and text associated with this comment.
-            mapper.setAuthor(taskRepository.createPerson(nativeComment.getUser()));
-            Date creationDate = parseDate(nativeComment.getCreated_at());
+            mapper.setAuthor(taskRepository.createPerson(comment.getUser()));
+            Date creationDate = parseDate(comment.getCreated_at());
             mapper.setCreationDate(creationDate);
-            mapper.setText(nativeComment.getBody());
+            mapper.setText(comment.getBody());
             mapper.setNumber(count);
 
             TaskAttribute attribute = taskData.getRoot().createAttribute(

@@ -54,6 +54,8 @@ public class GitHubService {
 
     private final Gson gson;
 
+    private String charset = "UTF-8";
+
     private final static String OPEN = "open/";
     private static final String REOPEN = "reopen/";
     private final static String CLOSE = "close/";
@@ -77,6 +79,10 @@ public class GitHubService {
 
     public void setProxy(String proxyHostname, int proxyPort) {
         httpClient.getHostConfiguration().setProxy(proxyHostname, proxyPort);
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 
     /**
@@ -114,7 +120,7 @@ public class GitHubService {
             // execute HTTP GET method
             executeMethod(method);
             // transform JSON to Java object
-            issues = gson.fromJson(new String(method.getResponseBody()), GitHubIssues.class);
+            issues = gson.fromJson(getResponseBody(method), GitHubIssues.class);
         } catch (GitHubServiceException e) {
             throw e;
         } catch (final RuntimeException runtimeException) {
@@ -283,7 +289,7 @@ public class GitHubService {
             method.setRequestBody(new NameValuePair[] { login, token, body, title });
 
             executeMethod(method);
-            showIssue = gson.fromJson(new String(method.getResponseBody()), GitHubShowIssue.class);
+            showIssue = gson.fromJson(getResponseBody(method), GitHubShowIssue.class);
 
             if (showIssue == null || showIssue.getIssue() == null) {
                 if (LOG.isErrorEnabled()) {
@@ -381,8 +387,7 @@ public class GitHubService {
             // execute HTTP GET method
             executeMethod(method);
             // transform JSON to Java object
-            GitHubShowIssue issue = gson.fromJson(new String(method.getResponseBody()),
-                    GitHubShowIssue.class);
+            GitHubShowIssue issue = gson.fromJson(getResponseBody(method), GitHubShowIssue.class);
 
             return issue.getIssue();
         } catch (GitHubServiceException e) {
@@ -521,7 +526,7 @@ public class GitHubService {
             // execute HTTP GET method
             executeMethod(method);
             // transform JSON to Java object
-            comments = gson.fromJson(new String(method.getResponseBody()), GitHubComments.class);
+            comments = gson.fromJson(getResponseBody(method), GitHubComments.class);
         } catch (GitHubServiceException e) {
             throw e;
         } catch (final RuntimeException runtimeException) {
@@ -545,7 +550,7 @@ public class GitHubService {
             // execute HTTP GET method
             executeMethod(method);
             // transform JSON to Java object
-            labels = gson.fromJson(new String(method.getResponseBody()), GitHubLabels.class);
+            labels = gson.fromJson(getResponseBody(method), GitHubLabels.class);
         } catch (GitHubServiceException e) {
             throw e;
         } catch (final RuntimeException runtimeException) {
@@ -557,6 +562,10 @@ public class GitHubService {
                 method.releaseConnection();
         }
         return labels;
+    }
+
+    private String getResponseBody(HttpMethod method) throws IOException {
+        return new String(method.getResponseBody(), charset);
     }
 
     public void addComment(String user, String repo, GitHubIssue issue,

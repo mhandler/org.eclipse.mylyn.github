@@ -122,6 +122,7 @@ public class GitHubRepositoryConnector extends AbstractRepositoryConnector {
             String user = computeTaskRepositoryUser(repository);
             String project = computeTaskRepositoryProject(repository);
 
+            service.setCharset(repository.getCharacterEncoding());
             setProxySetup(repository);
 
             // perform query
@@ -193,6 +194,7 @@ public class GitHubRepositoryConnector extends AbstractRepositoryConnector {
         String user = computeTaskRepositoryUser(repository);
         String project = computeTaskRepositoryProject(repository);
 
+        service.setCharset(repository.getCharacterEncoding());
         setProxySetup(repository);
 
         try {
